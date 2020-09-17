@@ -22,3 +22,5 @@ app.use(feedRoute);
 
 app.listen(8080);
 console.log(`server started on "192.168.0.104:8080/posts"`)
+
+//this is i done 
