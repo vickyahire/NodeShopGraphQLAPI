@@ -10,11 +10,14 @@ exports.getFeed = (req,res,next) =>{
 }
 
 exports.postFeed = (req,res,next) =>{
-    console.log('reach');
+    console.log('reach'); 
     const title = req.body.title;
     const content = req.body.content;
 
-    res.status(201).json({
-        posts:[{_id:new Date(),title:title,content:content}]
+    res.status(201).json({ 
+        meassage:'post created successfully',
+        post:{_id:"2",title:title,content:content,imageUrl:'images/duck.jpg',
+        creator:{name:"siddhant"},
+        createdAt:new Date()} 
     })
 }

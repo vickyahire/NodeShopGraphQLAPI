@@ -21,7 +21,7 @@ app.use((req,res,next)=>{
 app.use(feedRoute);
 
 app.listen(8080);
-console.log(`server started on "192.168.0.104:8080/posts"`)
+console.log(`server started on "192.168.0.109:8080/posts"`)
 
 //this is i done 
 //hello world
