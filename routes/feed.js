@@ -3,7 +3,7 @@ const {body} = require('express-validator')
 const router = express.Router();
 const feedController = require('../controllers/feed');
 
-router.get('/posts',feedController.getFeed);
+router.get('/posts',feedController.getPosts);
 
 router.post('/post',[
     body('title')
@@ -24,5 +24,7 @@ router.put('/post/:postId',[
     .trim()
     .isLength({min:5})
 ],feedController.updatePost);
+
+router.delete('/post/:postId',feedController.deletePost);
 
 module.exports =router;
