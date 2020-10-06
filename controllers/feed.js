@@ -6,33 +6,28 @@ const {validationResult} = require('express-validator');
 const { count } = require('console');
 const user = require('../models/user');
 
-exports.getPosts = (req,res,next) =>{
+exports.getPosts = async(req,res,next) =>{
     const currentPage = req.query.page || 1;
     const perPage = 2;
     let totalItems;
-    Post.find()
-    .countDocuments()
-    .then(count =>{
-        totalItems = count;
-        return Post.find()
+    try{
+    const totalItems = await Post.find().countDocuments().exec();
+    const posts = await Post.find()
             .skip((currentPage - 1) * perPage)
-            .limit(perPage);
-    })
-    .then(posts =>{
-        res
-            .status(200)
-            .json({
+            .limit(perPage).exec();
+
+        res.status(200).json({
                 meassage:'fetched posts successfully',
                 posts:posts,
                 totalItems:totalItems
             });
-    })
-    .catch(err=>{
+        }
+    catch(err){
         if (!err.statusCode){
             err.statusCode =500;
         }
         next(err);
-    })
+    }
 }
 
 exports.postFeed = (req,res,next) =>{   
@@ -84,22 +79,23 @@ exports.postFeed = (req,res,next) =>{
         )
 }
 
-exports.getPost = (req,res,next) =>{
+exports.getPost = async(req,res,next) =>{
  const postId = req.params.postId;
- Post.findById(postId)
-    .then(post =>{
+ try{
+ const post=await Post.findById(postId);
         if(!post) {
             const error = new Error('Could not find post');
             error.statusCode = 404;
             throw error;
         }
         res.status(200).json({meassage:'post fetched',post:post});
-    }).catch(err =>{
-        if(!err.statusCode){
+ }
+  catch(err){
+      if(!err.statusCode){
             err.statusCode = 500;
         }
         next(err);
-    })
+    }
 }
 exports.updatePost = (req,res,next) =>{
     const postId = req.params.postId;
