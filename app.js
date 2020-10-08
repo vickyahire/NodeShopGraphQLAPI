@@ -48,12 +48,16 @@ app.use((error,req,res,next)=>{
     res.status(status).json({message:message});
 })
 
-mongoose.connect('mongodb+srv://sid:Ahire@000@cluster0.njkhp.mongodb.net/APIPractice',{useNewUrlParser:true,useUnifiedTopology:true}).then(result =>{
-    app.listen(8080);
-    console.log(`server started on "192.168.0.109:8080/posts"`);
-    
-}
-).catch(err => console.log(err));
+mongoose.connect('mongodb+srv://sid:Ahire@000@cluster0.njkhp.mongodb.net/APIPractice',{useNewUrlParser:true,useUnifiedTopology:true})
+    .then(result =>{
+        const server = app.listen(8080);
+        const io = require('./socket').init(server);
+        console.log(`server started on "192.168.0.109:8080/posts"`);
+        io.on('connection',socket => {
+            console.log('Client connected');    
+        });
+})
+.catch(err => console.log(err));
 
 //this is i done 
 //hello world
