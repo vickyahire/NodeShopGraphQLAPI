@@ -4,8 +4,9 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const { response } = require('express');
 const multer = require('multer');
-const feedRoute = require('./routes/feed');
-const authRoute = require('./routes/auth');
+const graphqlSchema = require('./graphql/schema');
+const graphqlResolver = require('./graphql/resolvers');
+const { graphqlHTTP } = require('express-graphql');
 
 const app = express();
 
@@ -35,10 +36,15 @@ app.use((req,res,next)=>{
     res.setHeader('Access-Control-Allow-Methods','GET,POST,PUT,DELETE,PATCH');
     res.setHeader('Access-Control-Allow-Headers','Content-Type,Authorization');
     next();
-})
+});
 
-app.use(feedRoute);
-app.use('/auth',authRoute);
+app.use('/graphql',graphqlHTTP({
+    schema:graphqlSchema,
+    rootValue:graphqlResolver,
+    graphiql:true
+})
+);
+
 
 
 app.use((error,req,res,next)=>{
@@ -50,12 +56,8 @@ app.use((error,req,res,next)=>{
 
 mongoose.connect('mongodb+srv://sid:Ahire@000@cluster0.njkhp.mongodb.net/APIPractice',{useNewUrlParser:true,useUnifiedTopology:true})
     .then(result =>{
-        const server = app.listen(8080);
-        const io = require('./socket').init(server);
-        console.log(`server started on "192.168.0.109:8080/posts"`);
-        io.on('connection',socket => {
-            console.log('Client connected');    
-        });
+        console.log('server started on 192.168.0.109')
+        app.listen(8080)
 })
 .catch(err => console.log(err));
 
