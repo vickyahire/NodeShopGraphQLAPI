@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const User = require('../models/user');
+const Post = require('../models/post');
 const jwt = require('jsonwebtoken');
 
 module.exports = {
@@ -52,5 +53,41 @@ module.exports = {
             email:user.email
         },'somesupersecretsecret',{expiresIn:'1h'});
         return {token:token,userId:user._id.toString()}
+    },
+    createPost: async function({postInput},req){
+        console.log('reach');
+        const errors = [];
+        if(
+            validator.isEmpty(postInput.title) || 
+            !validator.isLength(postInput.title,{min:5})
+        ){
+            errors.push({message:'Title is invalid.'});
+        }
+        if(
+            validator.isEmpty(postInput.content) || 
+            !validator.isLength(postInput.content,{min:5})
+        ){
+            errors.push({message:'content is invalid.'});
+        }
+        if(errors.length > 0){
+            const error = new Error('Invalid input.');
+            error.data = errors;
+            error.code = 422;
+            throw error;
+        }
+        console.log('reach2')
+        const post = new Post({
+            title:postInput.title,
+            content:postInput.content,
+            imageUrl:postInput.imageUrl,
+            creator:postInput.creator
+        });
+        const createdPost = await post.save();
+        // Add post to user posts
+        return {...createdPost.doc,
+        _id:createdPost.id.toString(),
+        createdAt:createdPost.createdAt.toISOString(),
+        updatedAt:createdPost.updatedAt.toISOString()
+        };
     }
 }
