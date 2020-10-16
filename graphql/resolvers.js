@@ -56,6 +56,11 @@ module.exports = {
     },
     createPost: async function({postInput},req){
         console.log('reach');
+        if(!req.isAuth){
+            const error = new Error('Not authenticated!');
+            error.code = 401;
+            throw error;
+        }
         const errors = [];
         if(
             validator.isEmpty(postInput.title) || 
@@ -75,15 +80,18 @@ module.exports = {
             error.code = 422;
             throw error;
         }
-        console.log('reach2')
+        console.log('reach2');
+        const user = await User.findById(req.userId);
         const post = new Post({
             title:postInput.title,
             content:postInput.content,
             imageUrl:postInput.imageUrl,
-            creator:postInput.creator
+            creator:user
         });
         const createdPost = await post.save();
         // Add post to user posts
+        user.posts.push(createdPost);
+        await user.save();
         return {...createdPost.doc,
         _id:createdPost.id.toString(),
         createdAt:createdPost.createdAt.toISOString(),

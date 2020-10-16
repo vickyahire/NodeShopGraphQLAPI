@@ -39,7 +39,6 @@ module.exports = buildSchema(`
         title:String!
         content:String!
         imageUrl:String!
-        creator:String!
     }
 
     type RootMutation {
